@@ -2,15 +2,14 @@ TITLE_ID = TinyGLL04
 TARGET   = TinyGLL04
 OBJS     = lesson4.o
 
-LIBS = ../lib/libTinyGL.a -lvita2d -lpsp2shell -lpthread -lSceDisplay_stub -lSceGxm_stub \
+LIBS = -lTinyGL -lvita2d -lpsp2shell -lpthread -lSceDisplay_stub -lSceGxm_stub \
 	-lSceSysmodule_stub -lSceCtrl_stub -lScePgf_stub -lSceNetCtl_stub -lSceNet_stub -lScePower_stub \
-	-lSceKernel_stub -lSceCommonDialog_stub -lSceAudio_stub -lSceAppMgr_stub -lfreetype -lpng -ljpeg -lz -lm -lc
+	-lSceCommonDialog_stub -lSceAudio_stub -lSceAppMgr_stub -lfreetype -lpng -ljpeg -lz -lm -lc
 
 PREFIX  = arm-vita-eabi
 CC      = $(PREFIX)-gcc
-CFLAGS  = -Wl,-q -Wall -O3 -I../src -I../include \
-			-ftree-vectorize -mword-relocations -fomit-frame-pointer -ffast-math \
-			-march=armv7-a -mtune=cortex-a9 -mfpu=neon -mfloat-abi=hard
+CFLAGS  = -Wl,-q -Wall -O3 -ftree-vectorize -mword-relocations -fomit-frame-pointer -ffast-math \
+					-march=armv7-a -mtune=cortex-a9 -mfpu=neon -mfloat-abi=hard
 ASFLAGS = $(CFLAGS)
 
 all: $(TARGET).vpk
@@ -27,9 +26,6 @@ eboot.bin: $(TARGET).velf
 
 $(TARGET).elf: $(OBJS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
-
-%.o: %.png
-	$(PREFIX)-ld -r -b binary -o $@ $^
 
 clean:
 	@rm -rf $(TARGET).vpk $(TARGET).velf $(TARGET).elf $(OBJS) \

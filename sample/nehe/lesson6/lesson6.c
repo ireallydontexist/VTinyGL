@@ -5,6 +5,7 @@
 #include <GL/gl.h>
 
 #include <psp2/kernel/processmgr.h>
+#include <psp2/net/netctl.h>
 #include <psp2shell.h>
 
 #define SCR_W 960
@@ -224,29 +225,39 @@ void DrawGLScene()
     
     glEnd();                                    // done with the polygon.
 
-    xrot+=15.0f;		                // X Axis Rotation	
-    yrot+=15.0f;		                // Y Axis Rotation
-    zrot+=15.0f;		                // Z Axis Rotation
+    xrot+=1.0f;		                // X Axis Rotation	
+    yrot+=1.0f;		                // Y Axis Rotation
+    zrot+=1.0f;		                // Z Axis Rotation
 
     // since this is double buffered, swap the buffers to display what just got drawn.
     vglSwap();
 }
 
-int main(int argc, char **argv) {
-	
-	psp2shell_init(3333);
-	
+int main(int argc, char **argv) 
+{
 	vglInit();
 
-    InitGL(SCR_W, SCR_H);
-    
-    while(1) {
+	if (psp2shell_init(3333, 0) != 0) 
+	{
+  	printf("psp2shell_init failed\n");
+	} 
+	else 
+	{
+  	SceNetCtlInfo info;
+  	sceNetCtlInetGetInfo(SCE_NETCTL_INFO_GET_IP_ADDRESS, &info);
+  	printf("init ok: %s 3333\n", info.ip_address);
+	}
+
+	InitGL(SCR_W, SCR_H);
+	
+	while(1) 
+	{
 		DrawGLScene();
 	}
     
-    vglClose();
-    psp2shell_exit();
-    sceKernelExitProcess(0);
-    
-    return 0;
+  vglClose();
+  psp2shell_exit();
+  sceKernelExitProcess(0);
+  
+  return 0;
 }

@@ -5,6 +5,7 @@
 #include <GL/gl.h>
 
 #include <psp2/kernel/processmgr.h>
+#include <psp2/net/netctl.h>
 #include <psp2shell.h>
 
 #define SCR_W 960
@@ -82,29 +83,38 @@ void DrawGLScene()
   glVertex3f(-1.0f,-1.0f, 0.0f);		// Bottom Left	
   glEnd();					// done with the polygon
 
-  rtri+=15.0f;					// Increase The Rotation Variable For The Triangle
-  rquad-=15.0f;					// Decrease The Rotation Variable For The Quad 
+  rtri+=1.0f;					// Increase The Rotation Variable For The Triangle
+  rquad-=1.0f;					// Decrease The Rotation Variable For The Quad 
 
   // swap the buffers to display, since double buffering is used.
   vglSwap();
-  
 }
 
-int main(int argc, char **argv) {
-	
-	psp2shell_init(3333);
-	
+int main(int argc, char **argv) 
+{
 	vglInit();
-
-    InitGL(SCR_W, SCR_H);
-    
-    while(1) {
+	
+	if (psp2shell_init(3333, 0) != 0) 
+	{
+  	printf("psp2shell_init failed\n");
+	} 
+	else 
+	{
+		SceNetCtlInfo info;
+		sceNetCtlInetGetInfo(SCE_NETCTL_INFO_GET_IP_ADDRESS, &info);
+		printf("init ok: %s 3333\n", info.ip_address);
+	}
+	
+	InitGL(SCR_W, SCR_H);
+	
+	while(1) 
+	{
 		DrawGLScene();
 	}
     
-    vglClose();
-    psp2shell_exit();
-    sceKernelExitProcess(0);
-    
-    return 0;
+	vglClose();
+	psp2shell_exit();
+	sceKernelExitProcess(0);
+	
+	return 0;
 }

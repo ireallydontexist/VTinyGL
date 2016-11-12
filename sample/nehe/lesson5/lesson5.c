@@ -5,6 +5,7 @@
 #include <GL/gl.h>
 
 #include <psp2/kernel/processmgr.h>
+#include <psp2/net/netctl.h>
 #include <psp2shell.h>
 
 #define SCR_W 960
@@ -21,18 +22,18 @@ float rquad = 0.0f;
 /* A general OpenGL initialization function.  Sets all of the initial parameters. */
 void InitGL(int Width, int Height)	        // We call this right after our OpenGL window is created.
 {
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// This Will Clear The Background Color To Black
-  glClearDepth(1.0);				// Enables Clearing Of The Depth Buffer
-  //glDepthFunc(GL_LESS);			        // The Type Of Depth Test To Do
-  glEnable(GL_DEPTH_TEST);		        // Enables Depth Testing
-  glShadeModel(GL_SMOOTH);			// Enables Smooth Color Shading
-
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();				// Reset The Projection Matrix
-
-  gluPerspective(45.0f,(GLfloat)Width/(GLfloat)Height,0.1f,100.0f);	// Calculate The Aspect Ratio Of The Window
-
-  glMatrixMode(GL_MODELVIEW);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);		// This Will Clear The Background Color To Black
+	glClearDepth(1.0);				// Enables Clearing Of The Depth Buffer
+	//glDepthFunc(GL_LESS);			        // The Type Of Depth Test To Do
+	glEnable(GL_DEPTH_TEST);		        // Enables Depth Testing
+	glShadeModel(GL_SMOOTH);			// Enables Smooth Color Shading
+	
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();				// Reset The Projection Matrix
+	
+	gluPerspective(45.0f,(GLfloat)Width/(GLfloat)Height,0.1f,100.0f);	// Calculate The Aspect Ratio Of The Window
+	
+	glMatrixMode(GL_MODELVIEW);
 }
 
 /* The function called when our window is resized (which shouldn't happen, because we're fullscreen) */
@@ -148,28 +149,38 @@ void DrawGLScene()
   glVertex3f( 1.0f,-1.0f,-1.0f);		// Bottom Right Of The Quad (Right)
   glEnd();					// Done Drawing The Cube
 
-  rtri+=15.0f;					// Increase The Rotation Variable For The Pyramid
-  rquad-=15.0f;					// Decrease The Rotation Variable For The Cube
+  rtri+=0.5f;					// Increase The Rotation Variable For The Pyramid
+  rquad-=0.5f;					// Decrease The Rotation Variable For The Cube
 
   // swap the buffers to display, since double buffering is used.
   vglSwap();
 }
 
-int main(int argc, char **argv) {
-	
-	psp2shell_init(3333);
-	
+int main(int argc, char **argv) 
+{
 	vglInit();
+	
+	if (psp2shell_init(3333, 0) != 0) 
+	{
+	  printf("psp2shell_init failed\n");
+	} 
+	else 
+	{
+	  SceNetCtlInfo info;
+	  sceNetCtlInetGetInfo(SCE_NETCTL_INFO_GET_IP_ADDRESS, &info);
+	  printf("init ok: %s 3333\n", info.ip_address);
+	}	
 
-    InitGL(SCR_W, SCR_H);
-    
-    while(1) {
+	InitGL(SCR_W, SCR_H);
+	
+	while(1) 
+	{
 		DrawGLScene();
 	}
-    
+	
 	vglClose();
-    psp2shell_exit();
-    sceKernelExitProcess(0);
-    
-    return 0;
+	psp2shell_exit();
+	sceKernelExitProcess(0);
+		
+	return 0;
 }
